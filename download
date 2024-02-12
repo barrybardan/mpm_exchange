@@ -1,0 +1,5 @@
+wget -r -l 7 -E -w 2 -A.html --directory-prefix=pages --follow-tags=a --random-wait --domains spb.metprommebel.ru --html-extension --no-clobber --no-parent -nc --accept-regex=https://spb.metprommebel.ru/catalogue.* https://spb.metprommebel.ru/catalogue
+# -
+# --accept-regex=https://spb.metprommebel.ru/catalogue/shkafy-dlya-razdevalok.*
+# --accept-regex=https://spb.metprommebel.ru/catalogue.*
+# https://spb.metprommebel.ru/catalogue/shkafy-dlya-razdevalok
