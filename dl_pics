@@ -1,0 +1,2 @@
+wget  -w 2 -P pics --random-wait  --no-clobber --force-directories -nc -i pics.txt
+# wget  -w 2 --directory-prefix=pics --random-wait  --no-clobber  -nc -i pics.txt

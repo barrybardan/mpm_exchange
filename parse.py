@@ -10,11 +10,13 @@ class Parser:
 
     root_path = 'pages/'
     data_file_path = 'data.txt'
-
+    pic_list_path = 'pics.txt'
 
     def parse_all(self):
         counter = 0;
         max_number = 1000000
+        # max_number = 100
+
         pages = self.get_pages_list()
         log(f"number of pages={len(pages)}")
         pages_info = []
@@ -29,6 +31,7 @@ class Parser:
                 break
         # self.check_result(pages_info)
         self.save_result(pages_info)
+        self.save_pic_list(pages_info)
 
 
     def check_result(self, pages_info):
@@ -36,6 +39,23 @@ class Parser:
         for page_info in pages_info:
             if page_info['main_pic'] == '':
                 print(page_info['url'])
+            for article in page_info['articles']:
+                if article.get('pic','') != '':
+                    print(f"{article['id']} = {article['pic']}")
+    
+    def save_pic_list(self, pages_info):
+        pics_list = []
+        for page_info in pages_info:
+            if page_info['main_pic'] != '':
+                pics_list.append('https://'+page_info['site']+page_info['main_pic'])
+            for article in page_info['articles']:
+                if article.get('pic','') != '':
+                    pics_list.append('https://'+page_info['site']+article['pic'])
+        with open(self.pic_list_path, 'w', encoding='utf-8') as file:
+            for pic in pics_list:
+                file.write(str(pic)+'\n')
+            file.close()    
+
 
 
     def save_result(self, pages_info):
@@ -58,7 +78,17 @@ class Parser:
         page_data['main_pic'] = self.get_main_pic(content)
         page_data['articles'] = self.get_articles(content)
 
+        pics_by_ids = self.get_pics_by_ids(content).items()
+        for id, pic in pics_by_ids:
+            self.add_pic_url_to_articles(id, pic, page_data['articles'])
+
         return page_data
+
+
+    def add_pic_url_to_articles(self, id, pic, articles):
+        for article in articles:
+            if article['id'] == id:
+                article['pic'] = pic
 
 
     def get_articles(self, content):
@@ -84,6 +114,26 @@ class Parser:
             return file.read()
         return ''
 
+    def get_pics_by_ids(self, content):
+        ids_and_pics = re.findall('<div itemprop="offers"[\s\S]*?id="(\d+)"[\s\S]*?<a href="([^"]+)"',content)
+        pics_by_ids = {}
+        for item in ids_and_pics:
+            id = item[0]
+            pic = item[1]
+            if not self.is_image_file(pic):
+                continue
+            pics_by_ids[id] = pic
+            # print(f'id={id} pic={pic}')
+        return pics_by_ids    
+
+
+    def is_image_file(self, filename):
+        image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']
+        lowercase_filename = filename.lower()
+        for ext in image_extensions:
+            if lowercase_filename.endswith(ext):
+                return True
+        return False
 
     def get_pages_list(self):
         pages = []
