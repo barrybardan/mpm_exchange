@@ -145,9 +145,11 @@ class Parser:
     def get_text_properties_from_text(self, text):
         # print(text)
         properties = re.findall('<dt>([^<]*)<\/dt>\s+<dd>([^<]*)<\/dd>',text)
-        text_properties = {}
+        text_properties = []
+
         for item in properties:
-            text_properties[item[0]] = item[1]
+            text_properties.append(item[0])
+            text_properties.append(item[1])
         return text_properties
 
 
