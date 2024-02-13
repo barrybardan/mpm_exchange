@@ -78,9 +78,14 @@ class Parser:
         page_data['main_pic'] = self.get_main_pic(content)
         page_data['articles'] = self.get_articles(content)
 
-        pics_by_ids = self.get_pics_by_ids(content).items()
-        for id, pic in pics_by_ids:
+        pics_by_ids = self.get_pics_by_ids(content)
+        for id, pic in pics_by_ids.items():
             self.add_pic_url_to_articles(id, pic, page_data['articles'])
+
+        text_properties_by_id = self.get_text_properties_by_id(content)
+        for id, properties in text_properties_by_id.items():
+            self.add_properties_to_articles(id, properties, page_data['articles'])
+        # print(text_properties_by_id)
 
         return page_data
 
@@ -90,6 +95,10 @@ class Parser:
             if article['id'] == id:
                 article['pic'] = pic
 
+    def add_properties_to_articles(self, id, properties, articles):
+        for article in articles:
+            if article['id'] == id:
+                article['properties'] = properties
 
     def get_articles(self, content):
         articles_strings = re.findall('<div itemprop="offers"[^>]+>',content)
@@ -125,6 +134,21 @@ class Parser:
             pics_by_ids[id] = pic
             # print(f'id={id} pic={pic}')
         return pics_by_ids    
+
+    def get_text_properties_by_id(self, content):
+        text_blocks = re.findall('<dl data-article="(\d+)\s*"([\s\S]*?)<\/dl>',content)
+        text_properties_by_id = {}
+        for item in text_blocks:
+            text_properties_by_id[item[0]] = self.get_text_properties_from_text(item[1])
+        return text_properties_by_id
+
+    def get_text_properties_from_text(self, text):
+        # print(text)
+        properties = re.findall('<dt>([^<]*)<\/dt>\s+<dd>([^<]*)<\/dd>',text)
+        text_properties = {}
+        for item in properties:
+            text_properties[item[0]] = item[1]
+        return text_properties
 
 
     def is_image_file(self, filename):
