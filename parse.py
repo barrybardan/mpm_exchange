@@ -76,7 +76,9 @@ class Parser:
         page_data['site'] = addr_arr[1]
         page_data['url'] = '/'.join(addr_arr[2:-1])
         page_data['main_pic'] = self.get_main_pic(content)
+        page_data['main_article'] = self.get_main_article(content)
         page_data['articles'] = self.get_articles(content)
+        page_data['description'] = self.get_description(content)
 
         pics_by_ids = self.get_pics_by_ids(content)
         for id, pic in pics_by_ids.items():
@@ -89,6 +91,29 @@ class Parser:
 
         return page_data
 
+    def get_main_article(self, content):
+        blocks = re.findall('JCECommerce.selected = {\'currencyCode\':\'RUB\',\'id\':\'(\d+)\'',content)
+        for block in blocks:
+            return block
+        return ''    
+        
+
+    def get_description(self,content):
+        decription_blocks = re.findall('<div class="full" itemprop="description">\s+<ul>[\s\S]+?<\/div>',content)
+        # print(decription_blocks)
+        elms = []
+
+        for block in decription_blocks:
+            strings = re.findall('<li>([\s\S]+?)<\/li>',block)
+            for st in strings:
+                elms.append(self.strip_html_and_new_line(st))
+        return elms        
+
+    def strip_html_and_new_line(self, str):
+        str = re.sub('<[^<]+?>|\\xa0|\n', '', str)
+        str = re.sub('"', '«', str)
+
+        return str
 
     def add_pic_url_to_articles(self, id, pic, articles):
         for article in articles:
