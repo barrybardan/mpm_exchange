@@ -20,11 +20,38 @@ def convert_webp_to_png(directory):
 
                     print(f"Converted {webp_path} to {png_path}")
 
+def make_thumbnails(directory, new_size):
+    thumb_size = (new_size,new_size)
+
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename.lower().endswith('.webp'):
+                continue
+            if filename.find("_"+str(new_size)) > 0:
+                continue
+            # Check if the file has a .webp extension
+            webp_path = os.path.join(root, filename)
+
+            # Open the WebP image using Pillow (PIL)
+            with Image.open(webp_path) as img:
+                # Get the path and name without the extension
+                name, _ = os.path.splitext(webp_path)
+
+                # Save the image as a PNG with the same name in the same directory
+                thumb_path = name + "_"+str(new_size)+".png"
+                try:
+                    img = img.convert('RGBA')
+                    img.thumbnail(thumb_size, Image.Resampling.LANCZOS)
+                    img.save(thumb_path, 'PNG')
+                    # print(f"Resized {webp_path} to {thumb_path}")
+                except:
+                    print('error converting' + webp_path)
+                
 
 
 def main():
-    directory_path = 'pics/spb.metprommebel.ru/upload/webp'
-    convert_webp_to_png(directory_path)
+    convert_webp_to_png('pics/spb.metprommebel.ru/upload/webp')
+    # make_thumbnails('pics/spb.metprommebel.ru',180)
 
 if __name__ == "__main__":
     main()
