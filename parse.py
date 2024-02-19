@@ -1,6 +1,6 @@
 import re
 import glob
-
+import html
 
 def log(message):
     print(message)    
@@ -36,13 +36,31 @@ class Parser:
 
     def check_result(self, pages_info):
         print('TESTING...')
+        self.check_description_number_of_elms(pages_info)
+    
+    def check_pics(self, pages_info):
         for page_info in pages_info:
             if page_info['main_pic'] == '':
                 print(page_info['url'])
             for article in page_info['articles']:
                 if article.get('pic','') != '':
                     print(f"{article['id']} = {article['pic']}")
-    
+        
+    def check_description_number_of_elms(self, pages_info):
+        article_and_number_of_description_elms = {}
+        for page_info in pages_info:
+            if page_info.get('description', None) == None:
+                continue
+            article_and_number_of_description_elms[page_info['main_article']] = len(page_info['description'])
+        sorted_articles = sorted(article_and_number_of_description_elms.items(), key=lambda x:x[1])
+        print(sorted_articles[-30:]) 
+        articles__str = ''
+        top_articles_by_number_of_desc_elms = []
+        for elm in sorted_articles[-30:]:
+            top_articles_by_number_of_desc_elms.append(elm[0])
+        print(','.join(top_articles_by_number_of_desc_elms))
+
+
     def save_pic_list(self, pages_info):
         pics_list = []
         for page_info in pages_info:
@@ -110,9 +128,9 @@ class Parser:
         return elms        
 
     def strip_html_and_new_line(self, str):
+        str = html.unescape(str)
         str = re.sub('<[^<]+?>|\\xa0|\n', '', str)
         str = re.sub('"', '«', str)
-
         return str
 
     def add_pic_url_to_articles(self, id, pic, articles):
