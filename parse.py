@@ -120,7 +120,7 @@ class Parser:
         accessories = {}
         acc_data = re.findall('<div class="access acc_block" price="\d+" name="\d+" el-article="(\d+)" accfor="([\d\s]+)">', content)
         for item in acc_data:
-            accessories[item[0]] = item[1]
+            accessories['article_' + item[0]] = item[1]
         return accessories
 
 
