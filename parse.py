@@ -15,7 +15,7 @@ class Parser:
     def parse_all(self):
         counter = 0;
         max_number = 1000000
-        # max_number = 100
+        # max_number = 2
 
         pages = self.get_pages_list()
         log(f"number of pages={len(pages)}")
@@ -97,6 +97,8 @@ class Parser:
         page_data['main_article'] = self.get_main_article(content)
         page_data['articles'] = self.get_articles(content)
         page_data['description'] = self.get_description(content)
+        page_data['accessories'] = self.get_accessories(content)
+
 
         pics_by_ids = self.get_pics_by_ids(content)
         for id, pic in pics_by_ids.items():
@@ -105,9 +107,22 @@ class Parser:
         text_properties_by_id = self.get_text_properties_by_id(content)
         for id, properties in text_properties_by_id.items():
             self.add_properties_to_articles(id, properties, page_data['articles'])
-        # print(text_properties_by_id)
+
+        discontinued_by_id =  self.get_discontinued_by_ids(content)   
+        for id, discontinued_vaue in discontinued_by_id.items():
+            self.add_discontinued_to_articles(id, '1', page_data['articles'])
+
+        # print(discontinued_by_id)
 
         return page_data
+
+    def get_accessories(self, content):
+        accessories = {}
+        acc_data = re.findall('<div class="access acc_block" price="\d+" name="\d+" el-article="(\d+)" accfor="([\d\s]+)">', content)
+        for item in acc_data:
+            accessories[item[0]] = item[1]
+        return accessories
+
 
     def get_main_article(self, content):
         blocks = re.findall('JCECommerce.selected = {\'currencyCode\':\'RUB\',\'id\':\'(\d+)\'',content)
@@ -128,8 +143,10 @@ class Parser:
         return elms        
 
     def strip_html_and_new_line(self, str):
+        str = str.replace('&nbsp;',' ')
         str = html.unescape(str)
-        str = re.sub('<[^<]+?>|\\xa0|\n', '', str)
+        str = re.sub('\\xa0', ' ', str)
+        str = re.sub('<[^<]+?>|\n', '', str)
         str = re.sub('"', '«', str)
         return str
 
@@ -142,6 +159,11 @@ class Parser:
         for article in articles:
             if article['id'] == id:
                 article['properties'] = properties
+
+    def add_discontinued_to_articles(self, id, value, articles):
+        for article in articles:
+            if article['id'] == id:
+                article['discontinued'] = value
 
     def get_articles(self, content):
         articles_strings = re.findall('<div itemprop="offers"[^>]+>',content)
@@ -158,6 +180,7 @@ class Parser:
         prop_dict = {}
         for property in properties:
             prop_dict[property[0]] = property[1]
+        prop_dict['discontinued'] = '0'    
         return prop_dict     
 
 
@@ -195,6 +218,14 @@ class Parser:
             text_properties.append(item[1])
         return text_properties
 
+    def get_discontinued_by_ids(self, text):
+        discontinued_items = re.findall('<div class="article">(\d+)<\/div>[\s\S]*?Снят с производства<\/div>',text)
+        discontinued_by_id = {}
+        for item in discontinued_items:
+            discontinued_by_id[item] = True
+            # print(item)
+        return discontinued_by_id    
+            
 
     def is_image_file(self, filename):
         image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']
