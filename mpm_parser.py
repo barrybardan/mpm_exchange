@@ -237,7 +237,7 @@ class Parser:
 
     def get_pages_list(self):
         pages = []
-        for filename in glob.glob(self.root_path+'**/index.html', recursive=True):
+        for filename in glob.glob(self.root_path+'**/*index.html', recursive=True):
             pages.append(filename)
         return pages   
 
