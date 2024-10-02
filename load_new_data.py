@@ -51,8 +51,8 @@ def save_pics(date_str):
     root_pics_dir = 'pics'
     for pic_url in lines:
         pic_dir_path, file_name = get_pic_dir_and_file_name(pic_url)
-        # print(pic_dir_path)
-        # print(file_name)
+        print(f'pic_dir_path = {pic_dir_path}')
+        print(f'file_name = {file_name}')
         pic_dir = os.path.join(root_pics_dir, pic_dir_path)
         pic_path = os.path.join(pic_dir, file_name)
         print(pic_path)
@@ -78,23 +78,23 @@ def get_pic_dir_and_file_name(pic_url):
 def load_new_data():
     page_list_loader = PageListLoader()
     # page_list_loader.load_new_pages()
-    pages = page_list_loader.get_new_pages_list()
-    # pages = get_test_pages_list()
+    # pages = page_list_loader.get_new_pages_list()
+    pages = get_test_pages_list()
 
 
-    # date_str = date.today().strftime("%Y-%m-%d")
-    # dir_path = 'pages_'+date_str
-    # save_pages(pages, dir_path)
-    # ps = Parser()
+    date_str = date.today().strftime("%Y-%m-%d")
+    dir_path = 'pages_'+date_str
+    save_pages(pages, dir_path)
+    ps = Parser()
 
-    # ps.root_path = dir_path + '/'
-    # ps.data_file_path = 'data_' + date_str + '.txt'
-    # ps.pic_list_path = 'pics_' + date_str + '.txt'
-    # ps.parse_all()
+    ps.root_path = dir_path + '/'
+    ps.data_file_path = 'data_' + date_str + '.txt'
+    ps.pic_list_path = 'pics_' + date_str + '.txt'
+    ps.parse_all()
 
-    # save_pics(date_str)
+    save_pics(date_str)
 
-    page_list_loader.save_progress_data()
+    # page_list_loader.save_progress_data()
 
 
     # ps.test_glob()

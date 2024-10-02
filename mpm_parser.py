@@ -1,6 +1,7 @@
 import re
 import glob
 import html
+import os
 
 def log(message):
     print(message)    
@@ -90,7 +91,8 @@ class Parser:
             return None
 
         page_data = {}
-        addr_arr = page_file.split('/')
+        addr_arr = page_file.split(os.sep)
+        print(addr_arr)
         page_data['site'] = addr_arr[1]
         page_data['url'] = '/'.join(addr_arr[2:-1])
         page_data['main_pic'] = self.get_main_pic(content)
