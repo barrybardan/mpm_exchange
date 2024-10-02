@@ -69,8 +69,8 @@ class PageListLoader:
             self.progress_data = {} 
         
         if not 'last_loaded_date' in self.progress_data:
-            # self.progress_data['last_loaded_date'] = date.fromisoformat('2024-08-17')
-            self.progress_data['last_loaded_date'] = date.fromisoformat('2024-09-01')
+            self.progress_data['last_loaded_date'] = date.fromisoformat('2024-08-17')
+            # self.progress_data['last_loaded_date'] = date.fromisoformat('2024-09-01')
 
 
     def save_progress_data(self):

@@ -1,10 +1,14 @@
 import os
 import requests
+import shutil
 from page_list_loader import PageListLoader
 from mpm_parser import Parser
 from datetime import date
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+
+
+SHARE_DIR =  'y:\\temp\\mpm_site_data\\'
 
 def get_test_pages_list():
     pages = []
@@ -48,11 +52,11 @@ def save_pics(date_str):
     with open(filename) as file:
         lines = [line.rstrip() for line in file]
     print(lines)
-    root_pics_dir = 'pics'
+    root_pics_dir = 'y:\\temp\\mpm_site_data\\pics'
     for pic_url in lines:
         pic_dir_path, file_name = get_pic_dir_and_file_name(pic_url)
-        print(f'pic_dir_path = {pic_dir_path}')
-        print(f'file_name = {file_name}')
+        # print(f'pic_dir_path = {pic_dir_path}')
+        # print(f'file_name = {file_name}')
         pic_dir = os.path.join(root_pics_dir, pic_dir_path)
         pic_path = os.path.join(pic_dir, file_name)
         print(pic_path)
@@ -78,8 +82,8 @@ def get_pic_dir_and_file_name(pic_url):
 def load_new_data():
     page_list_loader = PageListLoader()
     # page_list_loader.load_new_pages()
-    # pages = page_list_loader.get_new_pages_list()
-    pages = get_test_pages_list()
+    pages = page_list_loader.get_new_pages_list()
+    # pages = get_test_pages_list()
 
 
     date_str = date.today().strftime("%Y-%m-%d")
@@ -94,10 +98,11 @@ def load_new_data():
 
     save_pics(date_str)
 
-    # page_list_loader.save_progress_data()
+    shutil.copyfile(ps.data_file_path, SHARE_DIR + ps.data_file_path)
+
+    page_list_loader.save_progress_data()
 
 
-    # ps.test_glob()
 
 def main():
     load_new_data()
