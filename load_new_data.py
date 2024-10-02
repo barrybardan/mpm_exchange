@@ -8,9 +8,11 @@ from urllib.parse import parse_qs
 
 def get_test_pages_list():
     pages = []
-    pages.append('https://metprommebel.ru/catalogue/shkafy-dlya-razdevalok/shkaf-garderob-kd-144k/?oid=2385')
-    pages.append('https://metprommebel.ru/catalogue/sistemy-khraneniya-esd-antistaticheskie/statsionarnaya-kassetnitsa-na-2-yarusa-esd/?oid=90841')
+    pages.append('https://spb.metprommebel.ru/catalogue/pochtovye-yashchiki-serii-bazis-plyus/pochtovyy-yashchik-4-sektsionnyy-seriya-bazis-plyus/')
+    pages.append('https://spb.metprommebel.ru/catalogue/pochtovye-yashchiki-serii-bazis/metallicheskiy-pochtovyy-yashchik-4-sektsionnyy-seriya-bazis/')
     return pages 
+
+
 
 def save_pages(pages, dir_path):
     if len(pages) == 0:
@@ -18,9 +20,13 @@ def save_pages(pages, dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path,)  
     for page_url in pages:
-        oid = extract_param(page_url, 'oid')
-        file_name = oid + '_index.html'
-        file_path = os.path.join(dir_path, file_name)
+        file_name = 'index.html'
+        page_path = get_page_path(page_url) 
+        page_dir = os.path.join(dir_path, page_path)
+        if not os.path.exists(page_dir):
+            os.makedirs(page_dir,)  
+
+        file_path = os.path.join(page_dir, file_name)
         print(file_path)
         r = requests.get(page_url)  
         with open(file_path, 'wb') as f:
@@ -28,25 +34,68 @@ def save_pages(pages, dir_path):
     return dir_path
 
 
+def get_page_path(page_url):
+    page_path = page_url.replace('https://','')
+    return page_path
+
+
 def extract_param(url, param_name):
     parsed_url = urlparse(url)
     return parse_qs(parsed_url.query)[param_name][0]
 
+def save_pics(date_str):
+    filename = 'pics_'+date_str+'.txt'
+    with open(filename) as file:
+        lines = [line.rstrip() for line in file]
+    print(lines)
+    root_pics_dir = 'pics'
+    for pic_url in lines:
+        pic_dir_path, file_name = get_pic_dir_and_file_name(pic_url)
+        # print(pic_dir_path)
+        # print(file_name)
+        pic_dir = os.path.join(root_pics_dir, pic_dir_path)
+        pic_path = os.path.join(pic_dir, file_name)
+        print(pic_path)
+        if os.path.isfile(pic_path):
+            print('found downloaded')
+            continue
+        if not os.path.exists(pic_dir):
+            os.makedirs(pic_dir,)  
+
+        r = requests.get(pic_url)  
+        with open(pic_path, 'wb') as f:
+            f.write(r.content)
+
+
+def get_pic_dir_and_file_name(pic_url):
+    pic_path = pic_url.replace('https://','')
+    pic_path_arr = pic_path.split('/')
+    file_name = pic_path_arr[-1] 
+    pic_path_arr = pic_path_arr[:-1] 
+    pic_dir_path = '/'.join(pic_path_arr)
+    return pic_dir_path,  file_name
 
 def load_new_data():
     page_list_loader = PageListLoader()
-    # pages = page_list_loader.get_new_pages_list()
-    pages = get_test_pages_list()
-    print(pages)
-    date_str = date.today().strftime("%Y-%m-%d")
-    dir_path = 'pages_'+date_str
-    save_pages(pages, dir_path)
-    ps = Parser()
+    # page_list_loader.load_new_pages()
+    pages = page_list_loader.get_new_pages_list()
+    # pages = get_test_pages_list()
 
-    ps.root_path = dir_path + '/'
-    ps.data_file_path = 'data_' + date_str + '.txt'
-    ps.pic_list_path = 'pics_' + date_str + '.txt'
-    ps.parse_all()
+
+    # date_str = date.today().strftime("%Y-%m-%d")
+    # dir_path = 'pages_'+date_str
+    # save_pages(pages, dir_path)
+    # ps = Parser()
+
+    # ps.root_path = dir_path + '/'
+    # ps.data_file_path = 'data_' + date_str + '.txt'
+    # ps.pic_list_path = 'pics_' + date_str + '.txt'
+    # ps.parse_all()
+
+    # save_pics(date_str)
+
+    page_list_loader.save_progress_data()
+
 
     # ps.test_glob()
 

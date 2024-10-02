@@ -22,7 +22,7 @@ class PageListLoader:
 
     def get_new_pages_list(self):
         self.load_progress_data()
-        print(self.progress_data['last_loaded_date'])
+        print('last_loaded_date = '+str(self.progress_data['last_loaded_date']))
         date_start = self.progress_data['last_loaded_date']
         date_end = date.today() - timedelta(hours=23)  
 
@@ -30,6 +30,11 @@ class PageListLoader:
 
         for single_date in daterange(date_start, date_end):
             pages = pages + self.get_page_list_from_site(single_date)
+
+        pages = list(set(pages))
+
+        self.progress_data['last_loaded_date'] = date_end
+        print(f'last_loaded_date = {date_end}')
 
         return pages
 
@@ -41,7 +46,7 @@ class PageListLoader:
 
     def get_page_list_from_site(self, load_date):
         str_date = load_date.strftime("%Y-%m-%d")
-        url =  f'https://metprommebel.ru/local/ajax/url_offers.php?city=msk&from={str_date}&to={str_date}'
+        url =  f'https://metprommebel.ru/local/ajax/url_products.php?city=spb&from={str_date}&to={str_date}'
         response = requests.get(url)
         pages = []
         if response.status_code == 200:
@@ -69,4 +74,5 @@ class PageListLoader:
 
 
     def save_progress_data(self):
-        pass
+        with open('progress_data.txt', 'wb') as fp:
+            pickle.dump(self.progress_data, fp)
