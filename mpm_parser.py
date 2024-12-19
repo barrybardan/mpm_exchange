@@ -91,10 +91,15 @@ class Parser:
             return None
 
         page_data = {}
-        addr_arr = page_file.split(os.sep)
+
+        page_url = self.get_link(content)
+        print('get link returned '+page_url)
+        addr_arr = page_url.split(r'/')
         print(addr_arr)
-        page_data['site'] = addr_arr[1]
-        page_data['url'] = '/'.join(addr_arr[2:-1])
+
+        page_data['site'] = addr_arr[0]
+        page_data['url'] = '/'.join(addr_arr[1:-1])
+        print("URL = "+page_data['url'])
         page_data['main_pic'] = self.get_main_pic(content)
         page_data['main_article'] = self.get_main_article(content)
         page_data['articles'] = self.get_articles(content)
@@ -252,6 +257,15 @@ class Parser:
             return pic_url
         # return self.get_main_pic_st(content)
         return ''
+
+    def get_link(self, content):
+        links = re.findall('<link rel="canonical" href="https:\/\/([^"]+)"',content)
+        
+        for link in links:
+            return link
+        # return self.get_main_pic_st(content)
+        return ''
+
 
     # def get_main_pic_st(self, content):
     #     pic_urls = re.findall('<div class="st_pic" id="firpic">\s*<img src="([^"]+)"',content)

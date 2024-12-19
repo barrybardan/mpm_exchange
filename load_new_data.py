@@ -2,6 +2,7 @@ import os
 import requests
 import shutil
 from page_list_loader import PageListLoader
+from convert_to_png import convert_webp_to_png
 from mpm_parser import Parser
 from datetime import date
 from urllib.parse import urlparse
@@ -23,10 +24,13 @@ def save_pages(pages, dir_path):
         return 
     if not os.path.exists(dir_path):
         os.makedirs(dir_path,)  
+    counter = 0    
     for page_url in pages:
         file_name = 'index.html'
-        page_path = get_page_path(page_url) 
+        print(page_url)
+        page_path = str(counter).zfill(5)
         page_dir = os.path.join(dir_path, page_path)
+        print(page_dir)
         if not os.path.exists(page_dir):
             os.makedirs(page_dir,)  
 
@@ -35,6 +39,8 @@ def save_pages(pages, dir_path):
         r = requests.get(page_url)  
         with open(file_path, 'wb') as f:
             f.write(r.content)
+        counter += 1   
+
     return dir_path
 
 
@@ -81,16 +87,13 @@ def get_pic_dir_and_file_name(pic_url):
 
 def load_new_data():
     page_list_loader = PageListLoader()
-    # page_list_loader.load_new_pages()
     pages = page_list_loader.get_new_pages_list()
-    # pages = get_test_pages_list()
-
 
     date_str = date.today().strftime("%Y-%m-%d")
     dir_path = 'pages_'+date_str
     save_pages(pages, dir_path)
-    ps = Parser()
 
+    ps = Parser()
     ps.root_path = dir_path + '/'
     ps.data_file_path = 'data_' + date_str + '.txt'
     ps.pic_list_path = 'pics_' + date_str + '.txt'
@@ -102,7 +105,7 @@ def load_new_data():
 
     page_list_loader.save_progress_data()
 
-
+    convert_webp_to_png('y:/temp/mpm_site_data/pics')
 
 def main():
     load_new_data()
