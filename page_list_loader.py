@@ -26,7 +26,7 @@ class PageListLoader:
         date_start = self.progress_data['last_loaded_date']
         date_end = date.today() - timedelta(hours=23)  
 
-        pages = []
+        pages = self.get_page_list_from_task_file()
 
         for single_date in daterange(date_start, date_end):
             pages = pages + self.get_page_list_from_site(single_date)
@@ -38,6 +38,13 @@ class PageListLoader:
 
         return pages
 
+
+    def get_page_list_from_task_file(self):
+        try:
+            lines_list = open('y:\\temp\\mpm_site_data\\tasks\\pages.txt',  mode='r', encoding='utf-8-sig').read().splitlines()
+        except:
+            lines_list = []
+        return  lines_list   
 
     def load_new_pages(self):
         pages = self.get_new_pages_list()

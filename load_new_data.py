@@ -88,6 +88,7 @@ def get_pic_dir_and_file_name(pic_url):
 def load_new_data():
     page_list_loader = PageListLoader()
     pages = page_list_loader.get_new_pages_list()
+    print(pages)
 
     date_str = date.today().strftime("%Y-%m-%d")
     dir_path = 'pages_'+date_str
