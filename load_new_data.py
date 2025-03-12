@@ -36,9 +36,12 @@ def save_pages(pages, dir_path):
 
         file_path = os.path.join(page_dir, file_name)
         print(file_path)
-        r = requests.get(page_url)  
-        with open(file_path, 'wb') as f:
-            f.write(r.content)
+        r = requests.get(page_url) 
+        page_content = r.content.decode("utf-8")
+        page_content += page_content + '<!-- mpm_parser_page_was_loaded_from_url="' + page_url+'" --!>'
+
+        with open(file_path, 'w', encoding="utf-8") as f:
+            f.write(page_content)
         counter += 1   
 
     return dir_path
@@ -91,7 +94,7 @@ def load_new_data():
     print(pages)
 
     date_str = date.today().strftime("%Y-%m-%d")
-    dir_path = 'pages_'+date_str
+    dir_path = 'pages/pages_'+date_str
     save_pages(pages, dir_path)
 
     ps = Parser()
@@ -101,11 +104,8 @@ def load_new_data():
     ps.parse_all()
 
     save_pics(date_str)
-
     shutil.copyfile(ps.data_file_path, SHARE_DIR + ps.data_file_path)
-
     page_list_loader.save_progress_data()
-
     convert_webp_to_png('y:/temp/mpm_site_data/pics')
 
 def main():

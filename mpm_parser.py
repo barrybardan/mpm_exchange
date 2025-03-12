@@ -259,12 +259,21 @@ class Parser:
         return ''
 
     def get_link(self, content):
-        links = re.findall('<link rel="canonical" href="https:\/\/([^"]+)"',content)
+        links = re.findall('mpm_parser_page_was_loaded_from_url="https:\/\/([^"]+)"',content)
         
         for link in links:
             return link
         # return self.get_main_pic_st(content)
+        return self.get_link_from_page_content(content)
+
+    def get_link_from_page_content(self, content):
+        links = re.findall('<link rel="canonical" href="https:\/\/([^"]+)"',content)
+        
+        for link in links:
+            return link
         return ''
+
+        
 
 
     # def get_main_pic_st(self, content):
