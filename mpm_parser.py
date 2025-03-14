@@ -140,13 +140,16 @@ class Parser:
 
     def get_description(self,content):
         decription_blocks = re.findall('<div class="full" itemprop="description">\s+<ul>[\s\S]+?<\/div>',content)
-        # print(decription_blocks)
+        print(decription_blocks)
         elms = []
 
         for block in decription_blocks:
             strings = re.findall('<li>([\s\S]+?)<\/li>',block)
             for st in strings:
                 elms.append(self.strip_html_and_new_line(st))
+            break    
+
+
         return elms        
 
     def strip_html_and_new_line(self, str):
