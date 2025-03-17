@@ -21,16 +21,20 @@ class Parser:
         pages = self.get_pages_list()
         log(f"number of pages={len(pages)}")
         pages_info = []
+        not_found = []
         for page_file in pages:
             page_data = self.get_page_data(page_file)
-            if page_data == None:
+            if page_data['not_found'] == True:
+                not_found.append(page_data['full_url'])
                 continue
             counter += 1
+            del page_data['not_found']
             pages_info.append(page_data)    
             # log(page_data)
             if counter > max_number:
                 break
         # self.check_result(pages_info)
+        self.save_not_found(not_found)
         self.save_result(pages_info)
         self.save_pic_list(pages_info)
 
@@ -83,13 +87,19 @@ class Parser:
                 file.write(str(page_data)+'\n')
             file.close()    
 
+    def save_not_found(self, not_found_list):
+        if len(not_found_list) == 0:
+            return
+        not_found_name= self.data_file_path.replace('data','not_found')
+        with open(not_found_name, 'w', encoding='utf-8') as file:
+            for url in not_found_list:
+                file.write(url+'\n')
+            file.close()    
+
 
     def get_page_data(self, page_file):
         content = self.get_file_content(page_file)
         # log(content)
-        if content.find('class="article-block"') == -1:
-            return None
-
         page_data = {}
 
         page_url = self.get_link(content)
@@ -100,6 +110,16 @@ class Parser:
         page_data['site'] = addr_arr[0]
         page_data['url'] = '/'.join(addr_arr[1:-1])
         print("URL = "+page_data['url'])
+
+        page_data['not_found'] = False
+
+        if content.find('class="article-block"') == -1:
+            page_data['full_url'] = page_url
+            page_data['not_found'] = True
+            return page_data
+
+
+
         page_data['main_pic'] = self.get_main_pic(content)
         page_data['main_article'] = self.get_main_article(content)
         page_data['articles'] = self.get_articles(content)
