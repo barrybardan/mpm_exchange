@@ -124,7 +124,7 @@ def main():
     # save_pics(date_str)
     # convert_webp_to_png('y:/temp/mpm_site_data/pics')
     # dir_path = 'pages/pages_'+date_str    
-    # parse_data(dir_path, date_str)
+    # parse_data_and_return_parser(dir_path, date_str)
 
 if __name__ == "__main__":
     main()

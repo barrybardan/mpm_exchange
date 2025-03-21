@@ -24,11 +24,14 @@ class Parser:
         not_found = []
         for page_file in pages:
             page_data = self.get_page_data(page_file)
-            if page_data['not_found'] == True:
-                not_found.append(page_data['full_url'])
+            if page_data['not_an_article'] == True:
+                if page_data['not_found'] == True:
+                    not_found.append(page_data['full_url'])
                 continue
             counter += 1
             del page_data['not_found']
+            del page_data['not_an_article']
+
             pages_info.append(page_data)    
             # log(page_data)
             if counter > max_number:
@@ -112,12 +115,14 @@ class Parser:
         print("URL = "+page_data['url'])
 
         page_data['not_found'] = False
+        page_data['not_an_article'] = False
+
 
         if content.find('class="article-block"') == -1:
             page_data['full_url'] = page_url
-            page_data['not_found'] = True
+            page_data['not_found'] = self.get_not_found(content)
+            page_data['not_an_article'] = True
             return page_data
-
 
 
         page_data['main_pic'] = self.get_main_pic(content)
@@ -156,7 +161,12 @@ class Parser:
         for block in blocks:
             return block
         return ''    
-        
+
+    def get_not_found(self, content):
+        blocks = re.findall('<div class="page-404">',content)
+        for block in blocks:
+            return True
+        return False    
 
     def get_description(self,content):
         decription_blocks = re.findall('<div class="full" itemprop="description">\s+<ul>[\s\S]+?<\/div>',content)
