@@ -118,13 +118,18 @@ def parse_data_and_return_parser(dir_path, date_str):
     return ps
 
 
-def main():
-    load_new_data()
-    # date_str = date(2025,3,20).strftime("%Y-%m-%d")
+def test_run():
+    date_str = date(2025,3,18).strftime("%Y-%m-%d")
     # save_pics(date_str)
     # convert_webp_to_png('y:/temp/mpm_site_data/pics')
-    # dir_path = 'pages/pages_'+date_str    
-    # parse_data_and_return_parser(dir_path, date_str)
+    dir_path = 'pages/pages_'+date_str    
+    parse_data_and_return_parser(dir_path, date_str)
+
+
+def main():
+    load_new_data()
+    # test_run()  
+
 
 if __name__ == "__main__":
     main()
