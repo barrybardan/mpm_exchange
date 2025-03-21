@@ -97,11 +97,7 @@ def load_new_data():
     dir_path = 'pages/pages_'+date_str
     save_pages(pages, dir_path)
 
-    ps = Parser()
-    ps.root_path = dir_path + '/'
-    ps.data_file_path = 'data_' + date_str + '.txt'
-    ps.pic_list_path = 'pics_' + date_str + '.txt'
-    ps.parse_all()
+    ps = parse_data_and_return_parser(dir_path, date_str)
 
     not_found_file_path = 'not_found_' + date_str + '.txt'
 
@@ -113,8 +109,22 @@ def load_new_data():
     page_list_loader.save_progress_data()
     convert_webp_to_png('y:/temp/mpm_site_data/pics')
 
+def parse_data_and_return_parser(dir_path, date_str):
+    ps = Parser()
+    ps.root_path = dir_path + '/'
+    ps.data_file_path = 'data_' + date_str + '.txt'
+    ps.pic_list_path = 'pics_' + date_str + '.txt'
+    ps.parse_all()
+    return ps
+
+
 def main():
     load_new_data()
+    # date_str = date(2025,3,20).strftime("%Y-%m-%d")
+    # save_pics(date_str)
+    # convert_webp_to_png('y:/temp/mpm_site_data/pics')
+    # dir_path = 'pages/pages_'+date_str    
+    # parse_data(dir_path, date_str)
 
 if __name__ == "__main__":
     main()
