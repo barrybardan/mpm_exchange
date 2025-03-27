@@ -22,11 +22,14 @@ class Parser:
         log(f"number of pages={len(pages)}")
         pages_info = []
         not_found = []
+        not_an_article = []
         for page_file in pages:
             page_data = self.get_page_data(page_file)
             if page_data['not_an_article'] == True:
                 if page_data['not_found'] == True:
                     not_found.append(page_data['full_url'])
+                else:
+                    not_an_article.append(page_data['full_url'])        
                 continue
             counter += 1
             del page_data['not_found']
@@ -37,7 +40,9 @@ class Parser:
             if counter > max_number:
                 break
         # self.check_result(pages_info)
-        self.save_not_found(not_found)
+        self.save_url_list(not_found,'not_found')
+        self.save_url_list(not_an_article,'not_an_article')
+
         self.save_result(pages_info)
         self.save_pic_list(pages_info)
 
@@ -90,12 +95,12 @@ class Parser:
                 file.write(str(page_data)+'\n')
             file.close()    
 
-    def save_not_found(self, not_found_list):
-        if len(not_found_list) == 0:
+    def save_url_list(self, list, name):
+        if len(list) == 0:
             return
-        not_found_name= self.data_file_path.replace('data','not_found')
+        not_found_name= self.data_file_path.replace('data',name)
         with open(not_found_name, 'w', encoding='utf-8') as file:
-            for url in not_found_list:
+            for url in list:
                 file.write(url+'\n')
             file.close()    
 

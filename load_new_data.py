@@ -99,12 +99,19 @@ def load_new_data():
 
     ps = parse_data_and_return_parser(dir_path, date_str)
 
-    not_found_file_path = 'not_found_' + date_str + '.txt'
 
     save_pics(date_str)
     shutil.copyfile(ps.data_file_path, SHARE_DIR + ps.data_file_path)
+
+
+    not_found_file_path = 'not_found_' + date_str + '.txt'
     if os.path.isfile(not_found_file_path):
         shutil.copyfile(not_found_file_path, SHARE_DIR + not_found_file_path)
+
+    not_an_article_file_path = 'not_an_article_' + date_str + '.txt'
+    if os.path.isfile(not_an_article_file_path):
+        shutil.copyfile(not_an_article_file_path, SHARE_DIR + not_an_article_file_path)
+
 
     page_list_loader.save_progress_data()
     convert_webp_to_png('y:/temp/mpm_site_data/pics')
@@ -119,7 +126,7 @@ def parse_data_and_return_parser(dir_path, date_str):
 
 
 def test_run():
-    date_str = date(2025,3,18).strftime("%Y-%m-%d")
+    date_str = date(2025,3,26).strftime("%Y-%m-%d")
     # save_pics(date_str)
     # convert_webp_to_png('y:/temp/mpm_site_data/pics')
     dir_path = 'pages/pages_'+date_str    
