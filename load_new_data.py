@@ -36,14 +36,16 @@ def save_pages(pages, dir_path):
 
         file_path = os.path.join(page_dir, file_name)
         print(file_path)
-        r = requests.get(page_url) 
-        page_content = r.content.decode("utf-8")
-        page_content +=  '<!-- mpm_parser_page_was_loaded_from_url="' + page_url+'" --!>'
+        try:
+            r = requests.get(page_url) 
+            page_content = r.content.decode("utf-8")
+            page_content +=  '<!-- mpm_parser_page_was_loaded_from_url="' + page_url+'" --!>'
 
-        with open(file_path, 'w', encoding="utf-8") as f:
-            f.write(page_content)
-        counter += 1   
-
+            with open(file_path, 'w', encoding="utf-8") as f:
+                f.write(page_content)
+            counter += 1   
+        except:
+            pass
     return dir_path
 
 
