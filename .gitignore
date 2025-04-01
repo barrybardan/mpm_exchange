@@ -162,4 +162,5 @@ pages*/*
 pics/*
 data*.txt
 pics*.txt
-progress_data.txt
+progress_data*.txt
+not*.txt
