@@ -123,7 +123,7 @@ class Parser:
         page_data['not_an_article'] = False
 
 
-        if content.find('class="article-block"') == -1:
+        if content.find('class="catalog-detail__main"') == -1:
             page_data['full_url'] = page_url
             page_data['not_found'] = self.get_not_found(content)
             page_data['not_an_article'] = True
@@ -132,7 +132,7 @@ class Parser:
 
         page_data['main_pic'] = self.get_main_pic(content)
         page_data['main_article'] = self.get_main_article(content)
-        page_data['articles'] = self.get_articles(content)
+        page_data['articles'] = self.get_articles(content, page_data['main_article'])
         page_data['description'] = self.get_description(content)
         page_data['accessories'] = self.get_accessories(content)
 
@@ -162,7 +162,7 @@ class Parser:
 
 
     def get_main_article(self, content):
-        blocks = re.findall('JCECommerce.selected = {\'currencyCode\':\'RUB\',\'id\':\'(\d+)\'',content)
+        blocks = re.findall("'NAME':'(\d+)'",content)
         for block in blocks:
             return block
         return ''    
@@ -174,7 +174,7 @@ class Parser:
         return False    
 
     def get_description(self,content):
-        decription_blocks = re.findall('<div class="full" itemprop="description">\s+<ul>[\s\S]+?<\/div>',content)
+        decription_blocks = re.findall('<div class="descr_block" [^>]+>\s+<ul>[\s\S]+?<\/div>',content)
         print(decription_blocks)
         elms = []
 
@@ -210,23 +210,27 @@ class Parser:
             if article['id'] == id:
                 article['discontinued'] = value
 
-    def get_articles(self, content):
-        articles_strings = re.findall('<div itemprop="offers"[^>]+>',content)
+    def get_articles(self, content, main_article):
+        # articles_strings = re.findall('<div itemprop="offers"[^>]+>',content)
         
         articles = []
-        for article_str in articles_strings:
-            properties = self.get_properties(article_str)
-            articles.append(properties.copy())
+        article = {}
+        properties = self.get_properties(content, main_article)
+        article['id'] = main_article
+        article['discontinued'] = '0'
+        article['properties'] = properties.copy()
+        articles.append(article.copy())
         return  articles   
 
 
-    def get_properties(self, article):
-        properties = re.findall('(\w+)="([^"]+)"',article)
-        prop_dict = {}
+    def get_properties(self, content, main_article='0'):
+        properties = re.findall('<div class="properties-group__name-wrap">\s+<span [^>]+>([^<]+)<\/span>\s+<\/div>\s+<div class="properties-group__value-wrap">\s+<div [^>]+>\s+([^<]+)',content)
+        prop_list = []
         for property in properties:
-            prop_dict[property[0]] = property[1]
-        prop_dict['discontinued'] = '0'    
-        return prop_dict     
+            prop_list.append(property[0].replace('³','3').strip())
+            prop_list.append(property[1].replace('³','3').strip())
+
+        return prop_list     
 
 
     def get_file_content(self, file_path):
@@ -289,7 +293,7 @@ class Parser:
 
     def get_main_pic(self, content):
         # pic_urls = re.findall('<div class="item main-picture">\s+<a href="([^"]+)"',content)
-        pic_urls = re.findall('<div class="item main-picture">[\S\s]*?<a href="([^"]+)',content)
+        pic_urls = re.findall('<div id="big-photo-0" [^>]+>\s*<a href="([^"]+)',content)
         
         for pic_url in pic_urls:
             return pic_url

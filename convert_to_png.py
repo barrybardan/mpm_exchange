@@ -1,28 +1,38 @@
 import os
 from PIL import Image
 
-def convert_webp_to_png(directory):
+def convert_webp_to_png(directory, pic_path_list=None):
+
+    print(pic_path_list)
+
+    if pic_path_list is not None:
+        for pic_path in pic_path_list:
+            root, filename = os.path.split(pic_path)
+            convert_single_webp_to_png(root,filename)
+        return    
 
     for root, dirs, files in os.walk(directory):
         for filename in files:
+            convert_single_webp_to_png(root,filename)
             # Check if the file has a .webp extension
-            if filename.lower().endswith('.webp'):
-                webp_path = os.path.join(root, filename)
-                print(webp_path)
-                name, _ = os.path.splitext(webp_path)
-                png_path = name + ".png"
-                if os.path.isfile(png_path):
-                    print("FOUND png, SKIPPING")
-                    continue
-                
-                # Open the WebP image using Pillow (PIL)
-                with Image.open(webp_path) as img:
-                    # Get the path and name without the extension
 
-                    # Save the image as a PNG with the same name in the same directory
-                    img.save(png_path, 'PNG')
+def convert_single_webp_to_png(root,filename):
+    if filename.lower().endswith('.webp'):
+        webp_path = os.path.join(root, filename)
+        print(webp_path)
+        name, _ = os.path.splitext(webp_path)
+        png_path = name + ".png"
+        if os.path.isfile(png_path):
+            print("FOUND png, SKIPPING")
+            return
+        
+        # Open the WebP image using Pillow (PIL)
+        with Image.open(webp_path) as img:
+            # Get the path and name without the extension
 
-                    print(f"Converted {webp_path} to {png_path}")
+            # Save the image as a PNG with the same name in the same directory
+            img.save(png_path, 'PNG')
+            print(f"Converted {webp_path} to {png_path}")
 
 def make_thumbnails(directory, new_size):
     thumb_size = (new_size,new_size)

@@ -28,9 +28,12 @@ class PageListLoader:
 
         pages = self.get_page_list_from_task_file()
 
-        for single_date in daterange(date_start, date_end):
-            pages = pages + self.get_page_list_from_site(single_date)
-
+        try:
+            for single_date in daterange(date_start, date_end):
+                pages = pages + self.get_page_list_from_site(single_date)
+        except Exception as e:
+            print(f'Error while loading pages from site: {e}')
+            
         pages = list(set(pages))
 
         self.progress_data['last_loaded_date'] = date_end

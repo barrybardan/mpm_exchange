@@ -59,11 +59,15 @@ def extract_param(url, param_name):
     return parse_qs(parsed_url.query)[param_name][0]
 
 def save_pics(date_str):
-    filename = 'pics_'+date_str+'.txt'
+    
+    filename = os.path.join('result', 'pics_'+date_str+'.txt') 
     with open(filename) as file:
         lines = [line.rstrip() for line in file]
     print(lines)
     root_pics_dir = 'y:\\temp\\mpm_site_data\\pics'
+
+    pic_path_list = []
+
     for pic_url in lines:
         pic_dir_path, file_name = get_pic_dir_and_file_name(pic_url)
         # print(f'pic_dir_path = {pic_dir_path}')
@@ -73,6 +77,7 @@ def save_pics(date_str):
         print(pic_path)
         if os.path.isfile(pic_path):
             print('found downloaded')
+            pic_path_list.append(pic_path)
             continue
         if not os.path.exists(pic_dir):
             os.makedirs(pic_dir,)  
@@ -80,6 +85,9 @@ def save_pics(date_str):
         r = requests.get(pic_url)  
         with open(pic_path, 'wb') as f:
             f.write(r.content)
+            pic_path_list.append(pic_path)
+           
+    return pic_path_list
 
 
 def get_pic_dir_and_file_name(pic_url):
@@ -97,12 +105,11 @@ def load_new_data():
 
     date_str = date.today().strftime("%Y-%m-%d")
     dir_path = 'pages/pages_'+date_str
-    save_pages(pages, dir_path)
-
+    # temporary disabled
+    # save_pages(pages, dir_path)
     ps = parse_data_and_return_parser(dir_path, date_str)
 
-
-    save_pics(date_str)
+    pic_path_list = save_pics(date_str)
     shutil.copyfile(ps.data_file_path, SHARE_DIR + ps.data_file_path)
 
 
@@ -116,13 +123,13 @@ def load_new_data():
 
 
     page_list_loader.save_progress_data()
-    convert_webp_to_png('y:/temp/mpm_site_data/pics')
+    convert_webp_to_png('y:/temp/mpm_site_data/pics', pic_path_list)
 
 def parse_data_and_return_parser(dir_path, date_str):
     ps = Parser()
     ps.root_path = dir_path + '/'
-    ps.data_file_path = 'data_' + date_str + '.txt'
-    ps.pic_list_path = 'pics_' + date_str + '.txt'
+    ps.data_file_path =  os.path.join('result', 'data_' + date_str + '.txt')
+    ps.pic_list_path =  os.path.join('result', 'pics_' + date_str + '.txt')
     ps.parse_all()
     return ps
 
