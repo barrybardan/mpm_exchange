@@ -56,14 +56,14 @@ class PageListLoader:
 
     def get_page_list_from_site(self, load_date):
         str_date = load_date.strftime("%Y-%m-%d")
-        url =  f'https://metprommebel.ru/local/ajax/url_products.php?city=spb&from={str_date}&to={str_date}'
+        url =  f'https://metprommebel.ru/local/ajax/url_products.php?from={str_date}&to={str_date}'
         response = requests.get(url)
         pages = []
         if response.status_code == 200:
             pages_json = response.json()
             if pages_json != None:
                 for node in pages_json:
-                    pages.append(node['URL'])
+                    pages.append("https://metprommebel.ru"+node['URL'])
         else:
             print(f"Failed to download: {url}")
         return pages
@@ -77,9 +77,11 @@ class PageListLoader:
                 self.progress_data = pickle.load(fp)
         except:
             self.progress_data = {} 
-        
+        # self.progress_data['last_loaded_date'] = date.fromisoformat('2025-12-01')
+
+
         if not 'last_loaded_date' in self.progress_data:
-            self.progress_data['last_loaded_date'] = date.fromisoformat('2024-08-17')
+            self.progress_data['last_loaded_date'] = date.fromisoformat('2025-12-01')
             # self.progress_data['last_loaded_date'] = date.fromisoformat('2024-09-01')
 
 

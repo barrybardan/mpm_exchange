@@ -105,8 +105,7 @@ def load_new_data():
 
     date_str = date.today().strftime("%Y-%m-%d")
     dir_path = 'pages/pages_'+date_str
-    # temporary disabled
-    # save_pages(pages, dir_path)
+    save_pages(pages, dir_path)
     ps = parse_data_and_return_parser(dir_path, date_str)
 
     pic_path_list = save_pics(date_str)
